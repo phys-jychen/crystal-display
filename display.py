@@ -123,7 +123,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-f", "--file", type=str, default='', required=True, help="Input ROOT file")
-    parser.add_argument("-t", "--tree", type=str, default='EventTree', help="Input tree name (default: dp)")
+    parser.add_argument("-t", "--tree", type=str, default='EventTree', help="Input tree name (default: EventTree)")
     parser.add_argument("-i", "--title", type=str, default='', help="Title of display figure")
     parser.add_argument("-e", "--event", type=int, default=0, help="ID of the event to be displayed")
     parser.add_argument("-r", "--threshold", type=str, default=0, help="MIP threshold")

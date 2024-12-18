@@ -12,7 +12,6 @@ outputdir="/cefs/higgs/chenjiyuan/crystal2024/figs-display/${dir}"
 mkdir -p ${outputdir}
 
 filename="${source_path}/${dir}/RecoEnergy_Thr${threshold}.root"
-#tree=EventTree
 event_index=9
 output="EventDisplay_${particle}_${energy}GeV_Thr${threshold}_evt${event_index}.pdf"
 #show=0
@@ -30,12 +29,6 @@ elif [ $particle = "mu+" ]; then
     title+='$\mu^+$'
 elif [ $particle = "pi+" ]; then
     title+='$\pi^+$'
-elif [ $particle = "gamma" ]; then
-    title+='$\gamma$'
-elif [ $particle = "neutron" ]; then
-    title+='$n$'
-elif [ $particle = "proton" ]; then
-    title+='$p$'
 fi
 
 python /cefs/higgs/chenjiyuan/crystal2024/EventDisplay/display.py -f=$filename -i="$title" -e=$event_index -r=$threshold -d=$outputdir -o="$output"
