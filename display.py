@@ -109,8 +109,8 @@ def plot(fname: str, tree: str, event_index: int, title: str, MIPThreshold: str)
     ax.set_ylabel("Z [layer]", size='x-large')
     ax.set_zlabel("Y [cm]", size='x-large')
 
-    ax.text2D(0.1, 0.9, f'Threshold: {MIPThreshold} MIP\nEvent ID: {event_index}', transform=ax.transAxes)
-    ax.text2D(0.75, 0.9, r'$E_\mathrm{total} = $' + f'{np.sum(energy):.3f} MeV\n' + r'$E_\mathrm{max} = $' + f'{np.max(energy):.3f} MeV', transform=ax.transAxes)
+    ax.text2D(0.1, 0.9, f'Threshold: {MIPThreshold}' + r'$\,$MIP' + f'\nEvent ID: {event_index}', transform=ax.transAxes)
+    ax.text2D(0.75, 0.9, r'$E_\mathrm{total} = $' + f'{np.sum(energy):.3f}' + r'$\,$MeV' + f'\n' + r'$E_\mathrm{max} = $' + f'{np.max(energy):.3f}' + r'$\,$MeV', transform=ax.transAxes)
 
     m = plt.cm.ScalarMappable(cmap=cmap)
     m.set_array(energy)
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     if save_dir and output:
         plt.savefig(join(save_dir, output), bbox_inches='tight')
-        print("===> Figure ", join(save_dir, output), " successfully created!")
+        print("---> Figure ", join(save_dir, output), " successfully created!")
 
     if show:
         plt.show()
