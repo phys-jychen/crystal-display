@@ -16,7 +16,7 @@ Bias = 0.5 * CrystalLength
 threshold = 0
 
 
-def read_file(fname: str, tree:str, event_index: int):
+def read_file(fname: str, tree: str, event_index: int):
     with up.open(fname) as f:
         tree = f[tree]
         EventID = tree['EventID'].array(library='np')
@@ -27,8 +27,8 @@ def read_file(fname: str, tree:str, event_index: int):
         try:
             event = np.where(EventID == event_index)[0][0]
         except:
-            print(f'===> Event {event_index} does not exist in the ROOT file  {fname}')
-            print('===> Abort!')
+            print(f'---> Event {event_index} does not exist in the ROOT file  {fname}')
+            print('---> Abort!')
             sys.exit(1)
 
         layer = Layer[event]
@@ -51,6 +51,11 @@ def plot(fname: str, tree: str, event_index: int, title: str, MIPThreshold: str)
 
     assert len(Hit_X) == len(Hit_Y) == len(Hit_Z) == len(Hit_Energy)
 
+    if len(Hit_X) == 0:
+        print(f'---> Event {event_index} is empty')
+        print('---> Abort!')
+        sys.exit(1)
+
     d_xyz = dict()
 
     for i in np.arange(len(Hit_X)):
@@ -60,6 +65,11 @@ def plot(fname: str, tree: str, event_index: int, title: str, MIPThreshold: str)
             d_xyz[(Hit_X[i], Hit_Y[i], Hit_Z[i])] = Hit_Energy[i]
         else:
             d_xyz[(Hit_X[i], Hit_Y[i], Hit_Z[i])] += Hit_Energy[i]
+
+    if len(list(d_xyz.keys())) == 0:
+        print(f'---> Hits in event {event_index} do not pass MIP threshold')
+        print('---> Abort!')
+        sys.exit(1)
 
     x_temp = np.array(list(d_xyz.keys()))[:,0]
     y_temp = np.array(list(d_xyz.keys()))[:,1]
@@ -105,16 +115,18 @@ def plot(fname: str, tree: str, event_index: int, title: str, MIPThreshold: str)
 
     fig.suptitle(title, y=0.95, size='xx-large')
     ax.invert_xaxis()
-    ax.set_xlabel("X [cm]", size='x-large')
-    ax.set_ylabel("Z [layer]", size='x-large')
-    ax.set_zlabel("Y [cm]", size='x-large')
+    ax.set_xlabel('X [cm]', size='x-large')
+    ax.set_ylabel('Z [layer]', size='x-large')
+    ax.set_zlabel('Y [cm]', size='x-large')
 
     ax.text2D(0.1, 0.9, f'Threshold: {MIPThreshold}' + r'$\,$MIP' + f'\nEvent ID: {event_index}', transform=ax.transAxes)
-    ax.text2D(0.75, 0.9, r'$E_\mathrm{total} = $' + f'{np.sum(energy):.3f}' + r'$\,$MeV' + f'\n' + r'$E_\mathrm{max} = $' + f'{np.max(energy):.3f}' + r'$\,$MeV', transform=ax.transAxes)
+    ax.text2D(0.75, 0.9, r'$E_\mathrm{total} = $' + rf'{np.sum(energy):.3f}$\,$MeV' + f'\n' + r'$E_\mathrm{max} = $' + rf'{np.max(energy):.3f}$\,$MeV', transform=ax.transAxes)
 
     m = plt.cm.ScalarMappable(cmap=cmap)
     m.set_array(energy)
-    plt.colorbar(m, pad=0.2, ax=plt.gca()).set_label(label="Channel Energy [MeV]", size='x-large')
+    cb = plt.colorbar(m, pad=0.2, ax=plt.gca())
+    cb.set_label(label='Cell Energy [MeV]', size='x-large')
+    cb.minorticks_on()
 
     ax.view_init(elev=20, azim=-50, roll=0)
 
@@ -122,14 +134,14 @@ def plot(fname: str, tree: str, event_index: int, title: str, MIPThreshold: str)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-f", "--file", type=str, default='', required=True, help="Input ROOT file")
-    parser.add_argument("-t", "--tree", type=str, default='EventTree', help="Input tree name (default: EventTree)")
-    parser.add_argument("-i", "--title", type=str, default='', help="Title of display figure")
-    parser.add_argument("-e", "--event", type=int, default=0, help="ID of the event to be displayed")
-    parser.add_argument("-r", "--threshold", type=str, default=0, help="MIP threshold")
-    parser.add_argument("-d", "--dir", type=str, default=None, help="Directory to save the plot")
-    parser.add_argument("-o", "--output", type=str, default=None, help="File name of the output plot")
-    parser.add_argument("-s", "--show", type=int, default=1, choices=[0, 1], help="Instantly display or not")
+    parser.add_argument('-f', '--file', type=str, default='', required=True, help='Input ROOT file')
+    parser.add_argument('-t', '--tree', type=str, default='EventTree', help='Input tree name (default: EventTree)')
+    parser.add_argument('-i', '--title', type=str, default='', help='Title of display figure')
+    parser.add_argument('-e', '--event', type=int, default=0, help='ID of the event to be displayed')
+    parser.add_argument('-r', '--threshold', type=str, default=0, help='MIP threshold')
+    parser.add_argument('-d', '--dir', type=str, default=None, help='Directory to save the plot')
+    parser.add_argument('-o', '--output', type=str, default=None, help='File name of the output plot')
+    parser.add_argument('-s', '--show', type=int, default=1, choices=[0, 1], help='Display or not')
     args = parser.parse_args()
 
     filename = args.file
@@ -145,7 +157,7 @@ if __name__ == '__main__':
 
     if save_dir and output:
         plt.savefig(join(save_dir, output), bbox_inches='tight')
-        print("---> Figure ", join(save_dir, output), " successfully created!")
+        print(f'---> Figure {join(save_dir, output)} successfully created!')
 
     if show:
         plt.show()
